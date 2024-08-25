@@ -4,7 +4,8 @@ import jwt from "jsonwebtoken";
 import { env } from "../utils/env.js";
 
 export const findUserByEmail = (email) => User.findOne({ email });
-const updateUserWithToken = (id) => {
+
+export const updateUserWithToken = (id) => {
   const token = jwt.sign(
     {
       id,
@@ -14,9 +15,16 @@ const updateUserWithToken = (id) => {
 
   return User.findByIdAndUpdate(id, { token }, { new: true });
 };
+
 export const createUser = async (userData) => {
   const hashedPassword = await bcrypt.hash(userData.password, 10);
 
   const newUser = await User.create({ ...userData, password: hashedPassword });
   return updateUserWithToken(newUser._id);
+};
+
+export const findUser = (id) => User.findById(id);
+
+export const resetToken = (id) => {
+  User.findByIdAndUpdate(id, { token: "" });
 };
